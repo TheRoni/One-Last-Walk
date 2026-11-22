@@ -73,6 +73,34 @@ body {
   background: rgba(255, 255, 255, 0.14);
 }
 
+/* The action button (Bark, Fetch, Next) sits just above the touch strip */
+.action-button {
+  position: absolute;
+  right: 16px;
+  bottom: 100%;
+  margin-bottom: 12px;
+  min-width: 120px;
+  padding: 14px 24px;
+  border-radius: 999px;
+  background: rgba(255, 244, 220, 0.22);
+  border: 1px solid rgba(255, 244, 220, 0.55);
+  color: #fff;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: opacity 0.2s ease, background 0.15s ease;
+}
+
+.action-button:active {
+  background: rgba(255, 244, 220, 0.4);
+}
+
+.action-button.disabled {
+  opacity: 0.35;
+}
+
 /* Small screens: keep the labels readable without taking too much space */
 @media (max-width: 380px) {
   .touch-zone {

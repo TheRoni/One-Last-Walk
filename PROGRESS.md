@@ -1,17 +1,17 @@
 # One Last Walk: Progress
 
 ## Current stage
-Stage 1: Prototype (done)
+Stage 2: Scene 1 vertical slice (done)
 
 ## Stages
 - [x] **Stage 0: Setup.** Repository, `CLAUDE.md`, `PROGRESS.md`.
 - [x] **Stage 1: Prototype.** Barnaby moves on one screen with touch buttons. Plays on a phone. Files: `index.html`, `style.css`, `game.js`.
-- [ ] **Stage 2: Scene 1 vertical slice.** Parallax background, fetch, Bark button, dialogue, title card.
+- [x] **Stage 2: Scene 1 vertical slice.** Parallax background, fetch, Bark button, dialogue, title card. Files: `barnaby.js`, `meadow-art.js`, `dialogue.js`, `meadow.js`.
 - [ ] **Stage 3: Scenes 2 and 3.** Each scene in its own file, transitions, music.
 - [ ] **Stage 4: Polish.** Menu, mute, saving, offline support, icon.
 
 ## Next step
-Stage 2: Scene 1 vertical slice, in small steps (one file per step).
+Stage 3: Scenes 2 and 3. Plan the steps before writing code.
 
 ## Known issues
 - GitHub Pages is not turned on yet. Phone testing uses a private claude.ai link, which must be republished after each change.
@@ -20,3 +20,5 @@ Stage 2: Scene 1 vertical slice, in small steps (one file per step).
 - Plain HTML, CSS, and JavaScript. No libraries or external files.
 - Landscape or portrait: not decided yet.
 - Phone testing: private claude.ai test link for now. GitHub Pages can be turned on later.
+- The level is three screens wide, with a camera that follows Barnaby. Scene positions are fractions of screen width.
+- Scene scripts (`meadow.js`) and drawing (`meadow-art.js`) are separate, so each new scene can be its own pair of files.
