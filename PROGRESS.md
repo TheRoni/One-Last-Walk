@@ -1,24 +1,25 @@
 # One Last Walk: Progress
 
 ## Current stage
-Stage 4: Polish (scenes and sound are done; offline support, icon, and a phone check are left)
+Stage 4: Polish (icon, offline support, and app details are done; a phone check is left)
 
 ## Stages
 - [x] **Stage 0: Setup.** Repository, `CLAUDE.md`, `PROGRESS.md`.
 - [x] **Stage 1: Prototype.** Barnaby moves on one screen with touch buttons. Plays on a phone. Files: `index.html`, `style.css`, `game.js`.
 - [x] **Stage 2: Scene 1 vertical slice.** Parallax background, fetch, Bark button, dialogue, title card. Files: `barnaby.js`, `meadow-art.js`, `dialogue.js`, `meadow.js`.
 - [x] **Stage 3: Scenes 2 and 3.** Scenes, transitions, end screen, music, and sound are done, and pass a full headless playthrough. Files: `util.js`, `maya-adult.js`, `bench.js`, `hill.js`, `audio.js`.
-- [ ] **Stage 4: Polish.** Menu, mute, saving, offline support, icon.
+- [x] **Stage 4: Polish.** Mute button, title screen, offline support, home-screen icon, and app details are done. A pause menu and saving are not built, since the game is short.
 
 ## Next step
-Stage 4: offline support so the game works without internet, a home-screen icon and name, and a playtest on a phone.
+A phone playtest. Turn on GitHub Pages so the game can be installed and works offline, then fix anything from the playtest.
 
 ## Known issues
-- GitHub Pages is not turned on yet. Phone testing uses a private claude.ai link, which must be republished after each change.
+- GitHub Pages is not turned on yet. Until it is, the game cannot be installed on a phone or work offline. Phone testing uses a private claude.ai link, which must be republished after each change.
 
 ## Decisions log
 - Plain HTML, CSS, and JavaScript. No libraries or external files.
-- Landscape or portrait: not decided yet.
+- Orientation: landscape, set in the app details. The game also works in portrait.
+- Offline: `sw.js` saves the game's files on the phone. It uses the internet when available, and the saved copy when not. The app icons are PNG copies of `icon.svg`.
 - Phone testing: private claude.ai test link for now. GitHub Pages can be turned on later.
 - The level is three screens wide, with a camera that follows Barnaby. Scene positions are fractions of screen width.
 - Scene scripts (`meadow.js`) and drawing (`meadow-art.js`) are separate, so each new scene can be its own pair of files.

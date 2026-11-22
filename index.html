@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#1b2a3a">
+  <meta name="apple-mobile-web-app-title" content="One Last Walk">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <title>One Last Walk</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -31,5 +35,11 @@
   <script src="bench.js"></script>
   <script src="hill.js"></script>
   <script src="game.js"></script>
+  <script>
+    // Lets the game work offline, where the browser supports it
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    }
+  </script>
 </body>
 </html>

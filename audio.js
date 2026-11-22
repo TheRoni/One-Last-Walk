@@ -221,6 +221,20 @@
     playNote(1318.5, now + 0.25, 0.16, master);
   }
 
+  // Pause the sound when the game is in the background, and resume it when the player comes back
+  document.addEventListener('visibilitychange', function () {
+    if (!context) return;
+    try {
+      if (document.hidden) {
+        context.suspend();
+      } else if (started) {
+        context.resume();
+      }
+    } catch (error) {
+      // Ignore sound errors so the game keeps running
+    }
+  });
+
   window.GameAudio = {
     unlock: unlock,
     setMood: setMood,
