@@ -22,7 +22,8 @@ A short, emotional, story-driven 2D game. The player is **Barnaby**, a loyal dog
 
 ## Technical rules
 - Plain HTML5 Canvas, CSS, and JavaScript. Separate files for HTML, CSS, and JS.
-- No external libraries, images, or audio files. Everything works offline.
+- No external libraries or audio files. Everything works offline.
+- The only image files are the app icons (PNG, plus the SVG they are made from). Phones need them to show the game on the home screen.
 - Audio is synthesized with the Web Audio API: a soft music-box melody (brighter in Scene 1, softer in Scene 3), plus light sound effects and a Mute toggle.
 - Audio starts only after the first tap on the title screen.
 - Must work on phones: scales to the screen, no scrolling, no accidental zooming.

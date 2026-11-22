@@ -19,6 +19,8 @@ A phone playtest. Turn on GitHub Pages so the game can be installed and works of
 ## Decisions log
 - Plain HTML, CSS, and JavaScript. No libraries or external files.
 - Orientation: landscape, set in the app details. The game also works in portrait.
+- Icons: the three PNG icons stay, since phones need them for the home screen. The game bible now says so.
+- Long files: `game.js` (417 lines), `meadow.js` (355), and `hill.js` (315) stay as they are, by the owner's decision. They are not split.
 - Offline: `sw.js` saves the game's files on the phone. It uses the internet when available, and the saved copy when not. The app icons are PNG copies of `icon.svg`.
 - Phone testing: private claude.ai test link for now. GitHub Pages can be turned on later.
 - The level is three screens wide, with a camera that follows Barnaby. Scene positions are fractions of screen width.
