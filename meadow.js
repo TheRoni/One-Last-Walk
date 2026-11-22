@@ -33,6 +33,10 @@
     game = engine;
     engine.barnaby.x = START_X * engine.width;
     state.phase = 'intro';
+    state.fetches = 0;
+    state.barkTime = 0;
+    state.cheerTime = 0;
+    ball.mode = 'hidden';
     Dialogue.say(INTRO, function () {
       throwBall(FIRST_THROW_X);
     });
@@ -59,7 +63,7 @@
       state.phase = 'outro';
       Dialogue.say(OUTRO, function () {
         state.phase = 'finished';
-        game.fadeToEndCard('Scene 1 complete');
+        game.goTo('bench', 'YEAR 8 — THE RAINY BENCH');
       });
     }
   }

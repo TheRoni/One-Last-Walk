@@ -1,6 +1,6 @@
 // One Last Walk: the game engine.
-// Handles the canvas, controls, camera, Barnaby's walking, title cards, and the game loop.
-// Scenes and dialogue plug in through window.MeadowScene and window.Dialogue.
+// Handles the canvas, controls, camera, Barnaby's walking, fades, title cards, and the game loop.
+// Each scene lives in its own file and is listed in the scenes table below.
 
 (function () {
   'use strict';
@@ -17,6 +17,9 @@
   const GROUND_LINE = 0.62;  // where the ground starts, as a fraction of screen height
   const WORLD_SCREENS = 3;   // each level is three screens wide
 
+  const BLACK = '0, 0, 0';
+  const WARM = '255, 226, 170';
+
   const KEY_DIRECTIONS = {
     ArrowLeft: 'left',
     KeyA: 'left',
@@ -24,13 +27,21 @@
     KeyD: 'right'
   };
 
+  // Every scene, by name. Each one is defined in its own file.
+  const scenes = {
+    meadow: window.MeadowScene,
+    bench: window.BenchScene,
+    hill: window.HillScene
+  };
+
   const input = { left: false, right: false };
   let actionQueued = false;
 
-  // Fade state, used for title cards and the end of a scene
+  // The fade overlay, used for title cards, scene changes, and the end screen
   const fade = {
     active: false,
     alpha: 0,
+    color: BLACK,
     text: '',
     showText: false,
     steps: [],
@@ -46,10 +57,11 @@
     size: 0,          // Barnaby's size in pixels
     worldWidth: 0,    // total width of the level in pixels
     camX: 0,          // how far the camera has moved into the level
-    barnaby: { x: 0, facing: 1, walking: false, running: false, legTime: 0 },
-    scene: window.MeadowScene,
+    barnaby: { x: 0, facing: 1, walking: false, running: false, grey: false, legTime: 0 },
+    scene: scenes.meadow,
     showTitle: showTitle,
-    fadeToEndCard: fadeToEndCard
+    goTo: goTo,
+    fadeToWarm: fadeToWarm
   };
 
   // Keeps a horizontal position inside the level
@@ -62,6 +74,13 @@
   function updateCamera() {
     const maxCam = engine.worldWidth - engine.width;
     engine.camX = Math.min(Math.max(engine.barnaby.x - engine.width / 2, 0), maxCam);
+  }
+
+  // The height of the ground at a level position. Scenes with hills can change it.
+  function groundAt(x) {
+    const scene = engine.scene;
+    if (scene && scene.groundAt) return scene.groundAt(x, engine);
+    return engine.groundY;
   }
 
   // Sets the canvas size to match the screen, and keeps it sharp on high-density phone screens
@@ -151,7 +170,17 @@
     input.right = false;
   });
 
-  // Runs a list of fade steps one after another, then calls onDone
+  // Fades ---------------------------------------------------------------
+
+  // Starts a fade step: sets its colour and text, and runs its onStart if it has one
+  function beginStep() {
+    const step = fade.steps[fade.stepIndex];
+    fade.color = step.color || BLACK;
+    fade.showText = !!step.showText;
+    if (step.onStart) step.onStart();
+  }
+
+  // Runs fade steps one after another, then calls onDone
   function startFade(text, steps, onDone) {
     fade.active = true;
     fade.text = text;
@@ -159,6 +188,7 @@
     fade.stepIndex = 0;
     fade.stepTime = 0;
     fade.onDone = onDone || null;
+    beginStep();
   }
 
   function updateFade(dt) {
@@ -168,12 +198,13 @@
     fade.stepTime += dt;
     const k = Math.min(fade.stepTime / step.seconds, 1);
     fade.alpha = step.from + (step.to - step.from) * k;
-    fade.showText = !!step.showText;
 
     if (k >= 1) {
       fade.stepIndex += 1;
       fade.stepTime = 0;
-      if (fade.stepIndex >= fade.steps.length) {
+      if (fade.stepIndex < fade.steps.length) {
+        beginStep();
+      } else {
         fade.active = false;
         const done = fade.onDone;
         fade.onDone = null;
@@ -191,18 +222,34 @@
     ], onDone);
   }
 
-  // Fade to black and leave the text on screen, for the end of a scene
-  function fadeToEndCard(text, onDone) {
-    startFade(text, [
-      { from: fade.alpha, to: 1, seconds: 1.2 },
-      { from: 1, to: 1, seconds: 2.5, showText: true }
-    ], onDone);
+  function switchScene(key) {
+    engine.scene = scenes[key];
+    engine.barnaby.grey = key === 'hill';
+    engine.barnaby.walking = false;
+    engine.barnaby.running = false;
+  }
+
+  // Fades to black with a title card. The new scene is switched in while the title is on screen,
+  // and starts once the screen is clear again.
+  function goTo(key, title) {
+    startFade(title, [
+      { from: fade.alpha, to: 1, seconds: 0.8 },
+      { from: 1, to: 1, seconds: 2.2, showText: true, onStart: function () { switchScene(key); } },
+      { from: 1, to: 0, seconds: 0.8 }
+    ], function () {
+      if (engine.scene && engine.scene.start) engine.scene.start(engine);
+    });
+  }
+
+  // Fades to warm light and stays there, for the end screen
+  function fadeToWarm(seconds, onDone) {
+    startFade('', [{ from: fade.alpha, to: 1, seconds: seconds, color: WARM }], onDone);
   }
 
   function drawFade() {
     if (fade.alpha <= 0) return;
 
-    ctx.fillStyle = 'rgba(0, 0, 0, ' + fade.alpha + ')';
+    ctx.fillStyle = 'rgba(' + fade.color + ', ' + fade.alpha + ')';
     ctx.fillRect(0, 0, engine.width, engine.height);
 
     if (fade.showText && fade.text) {
@@ -214,16 +261,20 @@
     }
   }
 
-  // Moves Barnaby from the arrow keys or the touch buttons
+  // Moves Barnaby from the arrow keys or the touch buttons.
+  // The scene can make him run, or slow him down, or stop him.
   function moveBarnaby(dt) {
     const b = engine.barnaby;
+    const scene = engine.scene;
     const direction = (input.right ? 1 : 0) - (input.left ? 1 : 0);
-    b.walking = direction !== 0;
-    b.running = b.walking && !!(engine.scene && engine.scene.wantsRun && engine.scene.wantsRun(engine));
+    const speedFactor = scene && scene.speedFactor ? scene.speedFactor(engine) : 1;
+
+    b.walking = direction !== 0 && speedFactor > 0;
+    b.running = b.walking && !!(scene && scene.wantsRun && scene.wantsRun(engine));
 
     if (b.walking) {
       b.facing = direction;
-      const speed = b.running ? RUN_SPEED : WALK_SPEED;
+      const speed = (b.running ? RUN_SPEED : WALK_SPEED) * speedFactor;
       b.x = clampX(b.x + direction * speed * engine.width * dt);
       b.legTime += dt * (b.running ? 1.6 : 1);
     }
@@ -244,7 +295,7 @@
     }
   }
 
-  // Draws the scene background, then the level, then the dialogue box and any fade on top
+  // Draws the scene background, then the level, then the dialogue box, the fade, and any end screen
   function draw() {
     const scene = engine.scene;
     if (scene && scene.drawBackground) scene.drawBackground(ctx, engine);
@@ -252,12 +303,13 @@
     ctx.save();
     ctx.translate(-engine.camX, 0); // everything in the level moves with the camera
     const b = engine.barnaby;
-    Barnaby.draw(ctx, b.x, engine.groundY, engine.size, b.facing, b.walking, b.legTime, b.running);
+    Barnaby.draw(ctx, b.x, groundAt(b.x), engine.size, b.facing, b.walking, b.legTime, b.running, b.grey);
     if (scene && scene.drawWorld) scene.drawWorld(ctx, engine);
     ctx.restore();
 
     Dialogue.draw(ctx, engine.width, engine.height);
     drawFade();
+    if (scene && scene.drawOverlay) scene.drawOverlay(ctx, engine);
   }
 
   let lastTime = 0;
@@ -296,7 +348,7 @@
   resize();
   lastTime = performance.now();
   showTitle('YEAR 1 — THE MEADOW', function () {
-    if (engine.scene && engine.scene.start) engine.scene.start(engine);
+    engine.scene.start(engine);
   });
   requestAnimationFrame(frame);
 })();

@@ -4,7 +4,7 @@
 
   // Draws Barnaby. (x, groundY) is the spot where his paws touch the ground.
   // s is his size in pixels. facing is 1 for right, -1 for left.
-  function draw(ctx, x, groundY, s, facing, walking, legTime, running) {
+  function draw(ctx, x, groundY, s, facing, walking, legTime, running, grey) {
     const bodyColor = '#c8924f';
     const darkColor = '#7a5230';
 
@@ -64,6 +64,14 @@
     ctx.beginPath();
     ctx.arc(s * 0.84, -s * 1.18, s * 0.05, 0, Math.PI * 2);
     ctx.fill();
+
+    // Grey around the muzzle, for an older Barnaby
+    if (grey) {
+      ctx.fillStyle = 'rgba(214, 208, 200, 0.85)';
+      ctx.beginPath();
+      ctx.ellipse(s * 0.74, -s * 1.17, s * 0.16, s * 0.12, -0.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     ctx.restore();
   }
