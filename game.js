@@ -1,5 +1,5 @@
 // One Last Walk: the game engine.
-// Handles the canvas, controls, camera, Barnaby's walking, fades, title cards, and the game loop.
+// Handles the canvas, controls, camera, Barnaby's walking, fades, the title screen, and the game loop.
 // Each scene lives in its own file and is listed in the scenes table below.
 
 (function () {
@@ -10,6 +10,7 @@
   const btnLeft = document.getElementById('btn-left');
   const btnRight = document.getElementById('btn-right');
   const btnAction = document.getElementById('btn-action');
+  const btnMute = document.getElementById('btn-mute');
 
   const WALK_SPEED = 0.22;   // how far Barnaby walks per second, as a fraction of screen width
   const RUN_SPEED = 0.4;     // how far Barnaby runs per second, as a fraction of screen width
@@ -36,6 +37,7 @@
 
   const input = { left: false, right: false };
   let actionQueued = false;
+  let started = false; // false until the player taps on the title screen
 
   // The fade overlay, used for title cards, scene changes, and the end screen
   const fade = {
@@ -103,8 +105,11 @@
     updateCamera();
   }
 
+  // Any tap or key press that means "do the action" also unlocks the sound,
+  // because phones only allow sound after a tap
   function queueAction() {
     actionQueued = true;
+    window.GameAudio.unlock();
   }
 
   // Connects one on-screen zone to a direction. Holding the zone keeps Barnaby walking.
@@ -113,6 +118,8 @@
       event.preventDefault();
       input[direction] = true;
       element.classList.add('active');
+      window.GameAudio.unlock();
+      if (!started) queueAction(); // a tap on the controls also starts the game
     }
 
     function release(event) {
@@ -142,6 +149,18 @@
   canvas.addEventListener('pointerdown', function (event) {
     event.preventDefault();
     queueAction();
+  });
+
+  // The sound button in the top-right corner
+  function refreshMuteButton() {
+    btnMute.textContent = window.GameAudio.isMuted() ? 'Sound off' : 'Sound on';
+  }
+
+  btnMute.addEventListener('pointerdown', function (event) {
+    event.preventDefault();
+    window.GameAudio.unlock();
+    window.GameAudio.setMuted(!window.GameAudio.isMuted());
+    refreshMuteButton();
   });
 
   // Keyboard controls
@@ -227,6 +246,7 @@
     engine.barnaby.grey = key === 'hill';
     engine.barnaby.walking = false;
     engine.barnaby.running = false;
+    window.GameAudio.setMood(key);
   }
 
   // Fades to black with a title card. The new scene is switched in while the title is on screen,
@@ -259,6 +279,39 @@
       ctx.textBaseline = 'middle';
       ctx.fillText(fade.text, engine.width / 2, engine.height / 2);
     }
+  }
+
+  // Starts the game from the title screen. The tap has already unlocked the sound.
+  function beginGame() {
+    started = true;
+    window.GameAudio.setMood('meadow');
+    showTitle('YEAR 1 — THE MEADOW', function () {
+      engine.scene.start(engine);
+    });
+  }
+
+  // The title screen: the meadow sky, the game name, and a prompt to tap
+  function drawTitle() {
+    const w = engine.width;
+    const h = engine.height;
+
+    const sky = ctx.createLinearGradient(0, 0, 0, h);
+    sky.addColorStop(0, '#8ccbe9');
+    sky.addColorStop(0.6, '#d7f0f5');
+    sky.addColorStop(1, '#fff1d0');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#3a2a1a';
+    ctx.font = 'italic ' + Math.round(Math.max(28, Math.min(w * 0.09, 56))) + 'px Georgia, serif';
+    ctx.fillText('One Last Walk', w / 2, h * 0.38);
+
+    const pulse = 0.55 + 0.25 * Math.sin(performance.now() / 600);
+    ctx.fillStyle = 'rgba(58, 42, 26, ' + pulse + ')';
+    ctx.font = Math.round(Math.max(15, Math.min(w * 0.045, 22))) + 'px Georgia, serif';
+    ctx.fillText('Tap to begin', w / 2, h * 0.52);
   }
 
   // Moves Barnaby from the arrow keys or the touch buttons.
@@ -326,6 +379,14 @@
     const pressed = actionQueued;
     actionQueued = false;
 
+    // The title screen waits for the first tap
+    if (!started) {
+      if (pressed) beginGame();
+      drawTitle();
+      requestAnimationFrame(frame);
+      return;
+    }
+
     updateFade(dt);
 
     const dialogueWasOpen = Dialogue.isActive();
@@ -350,9 +411,7 @@
 
   window.addEventListener('resize', resize);
   resize();
+  refreshMuteButton();
   lastTime = performance.now();
-  showTitle('YEAR 1 — THE MEADOW', function () {
-    engine.scene.start(engine);
-  });
   requestAnimationFrame(frame);
 })();

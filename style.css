@@ -105,6 +105,21 @@ body {
   display: none;
 }
 
+/* The sound button sits in the top-right corner */
+.mute-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  z-index: 3;
+}
+
 /* Small screens: keep the labels readable without taking too much space */
 @media (max-width: 380px) {
   .touch-zone {

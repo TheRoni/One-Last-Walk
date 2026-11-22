@@ -103,6 +103,7 @@
       const m = MARKERS[i];
       if (!m.done && Math.abs(b.x / engine.width - m.x) < MARKER_RANGE) {
         m.done = true;
+        window.GameAudio.chime();
         Dialogue.say(m.lines);
         return;
       }
@@ -112,6 +113,7 @@
     if (state.phase === 'crest' && pressed) {
       state.phase = 'goodbye';
       Dialogue.say(GOODBYE, function () {
+        window.GameAudio.fadeOut(3);
         game.fadeToWarm(3, function () {
           state.phase = 'ended';
         });

@@ -12,13 +12,16 @@
   <div id="game-wrapper">
     <canvas id="game-canvas"></canvas>
 
+    <div id="btn-mute" class="mute-button">Sound on</div>
+
     <div id="touch-controls">
       <div class="touch-zone" id="btn-left" aria-label="Move left">&#9664;</div>
       <div class="touch-zone" id="btn-right" aria-label="Move right">&#9654;</div>
-      <div id="btn-action" class="action-button">Bark</div>
+      <div id="btn-action" class="action-button hidden"></div>
     </div>
   </div>
 
+  <script src="audio.js"></script>
   <script src="barnaby.js"></script>
   <script src="meadow-art.js"></script>
   <script src="dialogue.js"></script>

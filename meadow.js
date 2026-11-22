@@ -76,6 +76,7 @@
   function bark() {
     state.barkTime = 1.0;
     state.cheerTime = 0.8;
+    window.GameAudio.bark();
   }
 
   function update(dt, engine, pressed) {
