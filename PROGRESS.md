@@ -1,17 +1,17 @@
 # One Last Walk: Progress
 
 ## Current stage
-Stage 2: Scene 1 vertical slice (done)
+Stage 3: Scenes 2 and 3 (scenes and transitions done; music and sound still to do)
 
 ## Stages
 - [x] **Stage 0: Setup.** Repository, `CLAUDE.md`, `PROGRESS.md`.
 - [x] **Stage 1: Prototype.** Barnaby moves on one screen with touch buttons. Plays on a phone. Files: `index.html`, `style.css`, `game.js`.
 - [x] **Stage 2: Scene 1 vertical slice.** Parallax background, fetch, Bark button, dialogue, title card. Files: `barnaby.js`, `meadow-art.js`, `dialogue.js`, `meadow.js`.
-- [ ] **Stage 3: Scenes 2 and 3.** Each scene in its own file, transitions, music.
+- [ ] **Stage 3: Scenes 2 and 3.** Scenes, transitions, and the end screen are done and pass a full headless playthrough. Music and sound are still to do. Files: `util.js`, `maya-adult.js`, `bench.js`, `hill.js`.
 - [ ] **Stage 4: Polish.** Menu, mute, saving, offline support, icon.
 
 ## Next step
-Stage 3: Scenes 2 and 3. Plan the steps before writing code.
+Stage 3 (rest): music and sound. A soft music-box melody, the bark, rain, memory chimes, and a Mute button. Then a title screen that starts the sound on the first tap.
 
 ## Known issues
 - GitHub Pages is not turned on yet. Phone testing uses a private claude.ai link, which must be republished after each change.
