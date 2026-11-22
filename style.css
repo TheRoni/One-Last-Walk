@@ -1,0 +1,93 @@
+/* One Last Walk: page styling */
+
+/* Basic reset so the page fills the whole phone screen */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #1b2a3a;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+}
+
+/* The game area covers the whole screen */
+#game-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* The canvas is the drawing surface for the game */
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Touch controls sit along the bottom of the screen */
+#touch-controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 28%;
+  min-height: 120px;
+  display: flex;
+  flex-direction: row;
+  padding: 0 0 env(safe-area-inset-bottom, 0) 0;
+  pointer-events: auto;
+}
+
+/* Each touch zone is one half of the bottom strip */
+.touch-zone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+}
+
+/* A soft highlight while a finger or mouse is pressing a zone */
+.touch-zone.active {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Small screens: keep the labels readable without taking too much space */
+@media (max-width: 380px) {
+  .touch-zone {
+    font-size: 1.8rem;
+  }
+}
+
+/* Landscape phones: make the controls slimmer so the game area is larger */
+@media (orientation: landscape) and (max-height: 500px) {
+  #touch-controls {
+    height: 35%;
+    min-height: 90px;
+  }
+
+  .touch-zone {
+    font-size: 1.6rem;
+  }
+}
