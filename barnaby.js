@@ -4,13 +4,16 @@
 
   // Draws Barnaby. (x, groundY) is the spot where his paws touch the ground.
   // s is his size in pixels. facing is 1 for right, -1 for left.
-  function draw(ctx, x, groundY, s, facing, walking, legTime) {
+  function draw(ctx, x, groundY, s, facing, walking, legTime, running) {
     const bodyColor = '#c8924f';
     const darkColor = '#7a5230';
 
     ctx.save();
-    ctx.translate(x, groundY);
+    // Running bounces him up and down and leans him forward
+    const bounce = running ? Math.abs(Math.sin(legTime * 10)) * s * 0.06 : 0;
+    ctx.translate(x, groundY - bounce);
     ctx.scale(facing, 1); // flips him to face the way he walks
+    ctx.rotate(running ? 0.08 : 0);
     ctx.lineCap = 'round';
 
     // Tail
@@ -22,7 +25,8 @@
     ctx.stroke();
 
     // Legs swing while he walks
-    const swing = walking ? Math.sin(legTime * 10) * s * 0.12 : 0;
+    const swingSize = running ? 0.22 : 0.12;
+    const swing = walking ? Math.sin(legTime * 10) * s * swingSize : 0;
     ctx.lineWidth = s * 0.12;
     ctx.beginPath();
     ctx.moveTo(-s * 0.4, -s * 0.5);

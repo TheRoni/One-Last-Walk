@@ -22,3 +22,5 @@ Stage 3: Scenes 2 and 3. Plan the steps before writing code.
 - Phone testing: private claude.ai test link for now. GitHub Pages can be turned on later.
 - The level is three screens wide, with a camera that follows Barnaby. Scene positions are fractions of screen width.
 - Scene scripts (`meadow.js`) and drawing (`meadow-art.js`) are separate, so each new scene can be its own pair of files.
+- Barnaby runs (faster, bouncier) while the ball is in play. Scenes control this with `wantsRun`.
+- Maya is a girl: pink dress, pigtails with bows.

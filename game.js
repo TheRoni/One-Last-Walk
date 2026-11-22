@@ -12,6 +12,7 @@
   const btnAction = document.getElementById('btn-action');
 
   const WALK_SPEED = 0.22;   // how far Barnaby walks per second, as a fraction of screen width
+  const RUN_SPEED = 0.4;     // how far Barnaby runs per second, as a fraction of screen width
   const EDGE_MARGIN = 0.03;  // keeps Barnaby off the very edges of the level, as a fraction of width
   const GROUND_LINE = 0.62;  // where the ground starts, as a fraction of screen height
   const WORLD_SCREENS = 3;   // each level is three screens wide
@@ -45,7 +46,7 @@
     size: 0,          // Barnaby's size in pixels
     worldWidth: 0,    // total width of the level in pixels
     camX: 0,          // how far the camera has moved into the level
-    barnaby: { x: 0, facing: 1, walking: false, legTime: 0 },
+    barnaby: { x: 0, facing: 1, walking: false, running: false, legTime: 0 },
     scene: window.MeadowScene,
     showTitle: showTitle,
     fadeToEndCard: fadeToEndCard
@@ -218,11 +219,13 @@
     const b = engine.barnaby;
     const direction = (input.right ? 1 : 0) - (input.left ? 1 : 0);
     b.walking = direction !== 0;
+    b.running = b.walking && !!(engine.scene && engine.scene.wantsRun && engine.scene.wantsRun(engine));
 
     if (b.walking) {
       b.facing = direction;
-      b.x = clampX(b.x + direction * WALK_SPEED * engine.width * dt);
-      b.legTime += dt;
+      const speed = b.running ? RUN_SPEED : WALK_SPEED;
+      b.x = clampX(b.x + direction * speed * engine.width * dt);
+      b.legTime += dt * (b.running ? 1.6 : 1);
     }
   }
 
@@ -249,7 +252,7 @@
     ctx.save();
     ctx.translate(-engine.camX, 0); // everything in the level moves with the camera
     const b = engine.barnaby;
-    Barnaby.draw(ctx, b.x, engine.groundY, engine.size, b.facing, b.walking, b.legTime);
+    Barnaby.draw(ctx, b.x, engine.groundY, engine.size, b.facing, b.walking, b.legTime, b.running);
     if (scene && scene.drawWorld) scene.drawWorld(ctx, engine);
     ctx.restore();
 
@@ -274,6 +277,7 @@
 
     if (Dialogue.isActive() || fade.active) {
       engine.barnaby.walking = false;
+      engine.barnaby.running = false;
     } else {
       moveBarnaby(dt);
     }

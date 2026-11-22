@@ -106,6 +106,11 @@
     }
   }
 
+  // Barnaby runs while the ball is in play (thrown, waiting, or being carried back)
+  function wantsRun() {
+    return state.phase === 'throwing' || state.phase === 'ready' || state.phase === 'carrying';
+  }
+
   // The action button label: Fetch when the ball is in reach, otherwise Bark
   function actionLabel() {
     const playing = state.phase === 'throwing' || state.phase === 'ready' || state.phase === 'carrying';
@@ -113,69 +118,138 @@
     return canFetch() ? 'Fetch' : 'Bark';
   }
 
-  // Maya as a child: a red shirt, brown hair, and arms that go up when she throws or cheers
+  // A small bow made from two loops and a knot
+  function bow(ctx, x, y, s) {
+    ctx.ellipse(x - s * 0.07, y, s * 0.08, s * 0.05, -0.4, 0, Math.PI * 2);
+    ctx.ellipse(x + s * 0.07, y, s * 0.08, s * 0.05, 0.4, 0, Math.PI * 2);
+    ctx.ellipse(x, y, s * 0.035, s * 0.035, 0, 0, Math.PI * 2);
+  }
+
+  // Maya as a girl: a pink dress with a belt, long brown hair in pigtails with bows, and rosy cheeks.
+  // Her arms go up when she throws or cheers.
   function drawMaya(ctx, engine) {
     const s = engine.size * 0.9;
     const armsUp = state.cheerTime > 0 || (state.phase === 'throwing' && ball.t < 0.35);
     const handX = armsUp ? 0.35 * s : 0.3 * s;
     const handY = armsUp ? -1.85 * s : -0.8 * s;
+    const skin = '#f1c9a5';
+    const hair = '#5b3a29';
+    const dress = '#f08fa8';
+    const accent = '#e0457b';
 
     ctx.save();
     ctx.translate(MAYA_X * engine.width, engine.groundY);
     ctx.lineCap = 'round';
 
-    // Legs
-    ctx.strokeStyle = '#3d4f7a';
-    ctx.lineWidth = s * 0.16;
+    // Legs and shoes
+    ctx.strokeStyle = skin;
+    ctx.lineWidth = s * 0.13;
     ctx.beginPath();
-    ctx.moveTo(-s * 0.14, -s * 0.6);
-    ctx.lineTo(-s * 0.14, 0);
-    ctx.moveTo(s * 0.14, -s * 0.6);
-    ctx.lineTo(s * 0.14, 0);
+    ctx.moveTo(-s * 0.13, -s * 0.6);
+    ctx.lineTo(-s * 0.15, -s * 0.12);
+    ctx.moveTo(s * 0.13, -s * 0.6);
+    ctx.lineTo(s * 0.15, -s * 0.12);
     ctx.stroke();
 
+    ctx.fillStyle = accent;
+    ctx.beginPath();
+    ctx.ellipse(-s * 0.16, -s * 0.07, s * 0.13, s * 0.08, 0, 0, Math.PI * 2);
+    ctx.ellipse(s * 0.16, -s * 0.07, s * 0.13, s * 0.08, 0, 0, Math.PI * 2);
+    ctx.fill();
+
     // Back arm
-    ctx.strokeStyle = '#f1c9a5';
+    ctx.strokeStyle = skin;
     ctx.lineWidth = s * 0.1;
     ctx.beginPath();
-    ctx.moveTo(-s * 0.18, -s * 1.1);
+    ctx.moveTo(-s * 0.2, -s * 1.1);
     ctx.lineTo(-s * 0.3, -s * 0.8);
     ctx.stroke();
 
-    // Body
-    ctx.fillStyle = '#e07a5f';
+    // Long hair and pigtails, behind the head
+    ctx.fillStyle = hair;
     ctx.beginPath();
-    ctx.ellipse(0, -s * 0.95, s * 0.28, s * 0.36, 0, 0, Math.PI * 2);
+    ctx.ellipse(-s * 0.3, -s * 1.3, s * 0.1, s * 0.24, 0.15, 0, Math.PI * 2);
+    ctx.ellipse(s * 0.3, -s * 1.3, s * 0.1, s * 0.24, -0.15, 0, Math.PI * 2);
+    ctx.ellipse(0, -s * 1.42, s * 0.3, s * 0.33, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Front arm
+    // Dress: a fitted top that flares into a skirt
+    ctx.fillStyle = dress;
     ctx.beginPath();
-    ctx.moveTo(s * 0.18, -s * 1.1);
+    ctx.moveTo(-s * 0.18, -s * 1.15);
+    ctx.lineTo(s * 0.18, -s * 1.15);
+    ctx.lineTo(s * 0.2, -s * 0.9);
+    ctx.lineTo(s * 0.38, -s * 0.42);
+    ctx.quadraticCurveTo(0, -s * 0.32, -s * 0.38, -s * 0.42);
+    ctx.lineTo(-s * 0.2, -s * 0.9);
+    ctx.closePath();
+    ctx.fill();
+
+    // Belt
+    ctx.fillStyle = accent;
+    ctx.fillRect(-s * 0.2, -s * 0.93, s * 0.4, s * 0.05);
+
+    // Front arm
+    ctx.strokeStyle = skin;
+    ctx.lineWidth = s * 0.1;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.18, -s * 1.08);
     ctx.lineTo(handX, handY);
     ctx.stroke();
 
-    // Head and hair
-    ctx.fillStyle = '#f1c9a5';
+    // Head
+    ctx.fillStyle = skin;
     ctx.beginPath();
-    ctx.arc(0, -s * 1.5, s * 0.24, 0, Math.PI * 2);
+    ctx.arc(0, -s * 1.5, s * 0.25, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#5b3a29';
+    // Hair cap and fringe
+    ctx.fillStyle = hair;
     ctx.beginPath();
-    ctx.arc(0, -s * 1.55, s * 0.26, Math.PI, 0);
+    ctx.arc(0, -s * 1.55, s * 0.27, Math.PI, 0);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(s * 0.1, -s * 1.64, s * 0.09, 0, Math.PI * 2);
+    ctx.arc(-s * 0.08, -s * 1.66, s * 0.09, 0, Math.PI * 2);
     ctx.fill();
 
-    // Eye and smile
-    ctx.fillStyle = '#222';
+    // Rosy cheek
+    ctx.fillStyle = 'rgba(240, 120, 130, 0.5)';
     ctx.beginPath();
-    ctx.arc(s * 0.09, -s * 1.45, s * 0.03, 0, Math.PI * 2);
+    ctx.arc(s * 0.13, -s * 1.36, s * 0.05, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.strokeStyle = '#7a3b2e';
-    ctx.lineWidth = s * 0.03;
+    // Big eye with a highlight, and a small eyelash
+    ctx.fillStyle = '#2b1d14';
     ctx.beginPath();
-    ctx.arc(s * 0.06, -s * 1.36, s * 0.08, 0.2, Math.PI - 0.2);
+    ctx.ellipse(s * 0.1, -s * 1.47, s * 0.035, s * 0.045, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(s * 0.115, -s * 1.49, s * 0.012, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#2b1d14';
+    ctx.lineWidth = s * 0.02;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.06, -s * 1.52);
+    ctx.lineTo(s * 0.04, -s * 1.55);
     ctx.stroke();
+
+    // Smile
+    ctx.strokeStyle = '#7a3b2e';
+    ctx.lineWidth = s * 0.025;
+    ctx.beginPath();
+    ctx.arc(s * 0.07, -s * 1.37, s * 0.05, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+
+    // Bows on the pigtails
+    ctx.fillStyle = accent;
+    ctx.beginPath();
+    bow(ctx, -s * 0.3, -s * 1.58, s);
+    bow(ctx, s * 0.3, -s * 1.58, s);
+    ctx.fill();
 
     ctx.restore();
   }
@@ -267,6 +341,7 @@
     start: start,
     update: update,
     actionLabel: actionLabel,
+    wantsRun: wantsRun,
     drawBackground: function (ctx, engine) {
       MeadowArt.drawBackground(ctx, engine);
     },
