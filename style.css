@@ -101,6 +101,10 @@ body {
   opacity: 0.35;
 }
 
+.action-button.hidden {
+  display: none;
+}
+
 /* Small screens: keep the labels readable without taking too much space */
 @media (max-width: 380px) {
   .touch-zone {

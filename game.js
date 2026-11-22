@@ -289,9 +289,13 @@
       label = engine.scene.actionLabel(engine);
     }
 
-    btnAction.classList.toggle('disabled', label === null);
-    if (label !== null && btnAction.textContent !== label) {
-      btnAction.textContent = label;
+    // When there is nothing to do, hide the button and clear its text
+    const hidden = label === null;
+    btnAction.classList.toggle('hidden', hidden);
+    btnAction.classList.toggle('disabled', hidden);
+    const text = label || '';
+    if (btnAction.textContent !== text) {
+      btnAction.textContent = text;
     }
   }
 
