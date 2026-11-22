@@ -132,7 +132,7 @@
 
   function actionLabel() {
     if (state.phase === 'crest') return 'Rest Head';
-    if (state.phase === 'ended') return 'Replay';
+    // The end screen has its own Replay button, so the action button stays hidden
     return null;
   }
 
